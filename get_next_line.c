@@ -6,62 +6,94 @@
 /*   By: jaeklee <jaeklee@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 10:06:09 by jaeklee           #+#    #+#             */
-/*   Updated: 2025/05/13 16:17:44 by jaeklee          ###   ########.fr       */
+/*   Updated: 2025/05/14 18:05:49 by jaeklee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *get_next_line(int fd)
+static char	*read_and_store(int fd, char *remember)
 {
-    char *line;
-    char buffer[BUFFER_SIZE + 1];
-    char *new_line;
-    int read_bytes;
-    static char *remember; 
-    char *temp;
+	char	buffer[BUFFER_SIZE + 1];
+	char	*temp;
+	int		read_bytes;
 
-    if (fd < 0 || BUFFER_SIZE <= 0)
-        return (NULL);
-    if (!remember)
-        remember = ft_strjoin("", 0);
-    while (!ft_strchr(remember, '\n'))
-    {
-        read_bytes = read(fd, buffer, BUFFER_SIZE);
-        if (read_bytes <= 0)
-            break;
-        buffer[read_bytes] = '\0';
-        temp = ft_strjoin(remember, buffer);
-        if (!temp)
-            return (NULL);
-        free(remember);
-        remember = temp;
-    }
-    if (!remember || *remember == '\0')
-    {
-        free(remember);
-        remember = NULL;
-        return (NULL);
-    }
-    new_line = ft_strchr(remember, '\n');
-    if (new_line)
-    {
-        int len = (new_line - remember) + 1;
-        line = ft_substr(remember, 0, len);
-    }
-    else
-        line = ft_strdup(remember);
-    
-    if (!line)
-        return (NULL);
-        
-    if (new_line && *(new_line + 1) != '\0')
-    {
-        temp = ft_strdup(new_line + 1);
-       
-        remember = temp;
-    }
-    else
-        remember = NULL;
-    return (line);
+	while (!ft_strchr(remember, '\n'))
+	{
+		read_bytes = read(fd, buffer, BUFFER_SIZE);
+		if (read_bytes <= 0)
+			break ;
+		buffer[read_bytes] = '\0';
+		temp = ft_strjoin(remember, buffer);
+		if (!temp)
+		{
+			free(remember);
+			return (NULL);
+		}
+		free(remember);
+		remember = temp;
+	}
+	return (remember);
+}
+
+static char	*extract_line(char *remember)
+{
+	char	*line;
+	char	*new_line;
+	int		len;
+
+	if (!remember || *remember == '\0')
+		return (NULL);
+	new_line = ft_strchr(remember, '\n');
+	if (new_line)
+	{
+		len = (new_line - remember) + 1;
+		line = ft_substr(remember, 0, len);
+	}
+	else
+		line = ft_strdup(remember);
+	return (line);
+}
+
+static char	*update_remember(char *remember)
+{
+	char	*new_line;
+	char	*temp;
+
+	new_line = ft_strchr(remember, '\n');
+	if (new_line && *(new_line + 1) != '\0')
+	{
+		temp = ft_strdup(new_line + 1);
+		free(remember);
+		return (temp);
+	}
+	free(remember);
+	return (NULL);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*remember;
+	char		*line;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	if (!remember)
+		remember = ft_strdup("");
+	remember = read_and_store(fd, remember);
+	if (!remember || *remember == '\0')
+	{
+		free(remember);
+		remember = NULL;
+		return (NULL);
+	}
+	line = extract_line(remember);
+	if (!line)
+	{
+		free(remember);
+		remember = NULL;
+		return (NULL);
+	}
+	remember = update_remember(remember);
+	return (line);
 }
