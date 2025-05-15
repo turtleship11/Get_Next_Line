@@ -6,7 +6,7 @@
 /*   By: jaeklee <jaeklee@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 10:06:09 by jaeklee           #+#    #+#             */
-/*   Updated: 2025/05/14 18:03:03 by jaeklee          ###   ########.fr       */
+/*   Updated: 2025/05/14 18:32:22 by jaeklee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,11 @@ char	*ft_strdup(const char *src)
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	int		i;
-	int		j;
-	char	*tmp;
-	int		s1_len;
-	int		s2_len;
+	size_t		i;
+	size_t		j;
+	char		*tmp;
+	int			s1_len;
+	int			s2_len;
 
 	i = 0;
 	j = 0;

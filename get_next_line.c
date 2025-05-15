@@ -6,7 +6,7 @@
 /*   By: jaeklee <jaeklee@student.hive.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 10:06:09 by jaeklee           #+#    #+#             */
-/*   Updated: 2025/05/14 18:05:49 by jaeklee          ###   ########.fr       */
+/*   Updated: 2025/05/15 10:58:48 by jaeklee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static char	*extract_line(char *remember)
 	return (line);
 }
 
-static char	*update_remember(char *remember)
+static char	*find_newline(char *remember)
 {
 	char	*new_line;
 	char	*temp;
@@ -64,6 +64,11 @@ static char	*update_remember(char *remember)
 	if (new_line && *(new_line + 1) != '\0')
 	{
 		temp = ft_strdup(new_line + 1);
+		if (!temp)
+		{	
+			free(remember);
+			return (NULL);
+		}
 		free(remember);
 		return (temp);
 	}
@@ -80,6 +85,8 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!remember)
 		remember = ft_strdup("");
+	if (!remember)
+		return (NULL);
 	remember = read_and_store(fd, remember);
 	if (!remember || *remember == '\0')
 	{
@@ -94,6 +101,6 @@ char	*get_next_line(int fd)
 		remember = NULL;
 		return (NULL);
 	}
-	remember = update_remember(remember);
+	remember = find_newline(remember);
 	return (line);
 }
